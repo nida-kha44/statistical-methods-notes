@@ -1,0 +1,1352 @@
+---
+title: "📊 Materi Metode Statistika"
+subtitle: "Konsep Dasar Probabilitas, Sebaran, dan Inferensi Statistika"
+author: "Statistika Kuliah — Komprehensif"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+    df_print: paged
+    code_folding: show
+    css: |
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;600&family=Fira+Code&display=swap');
+
+      :root {
+        --indigo:    #3d405b;
+        --teal:      #2a9d8f;
+        --amber:     #e9c46a;
+        --coral:     #e76f51;
+        --cream:     #faf9f6;
+        --light-teal:#d4f1ee;
+        --light-amber:#fef9e7;
+        --light-coral:#fdecea;
+      }
+
+      body {
+        font-family: 'Source Sans 3', sans-serif;
+        background-color: var(--cream);
+        color: #2d2d2d;
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      h1, h2, h3, h4 {
+        font-family: 'Playfair Display', serif;
+        color: var(--indigo);
+      }
+
+      h1.title {
+        font-size: 2.6rem;
+        border-bottom: 4px solid var(--teal);
+        padding-bottom: 10px;
+        margin-bottom: 5px;
+      }
+
+      h2 {
+        border-left: 5px solid var(--teal);
+        padding-left: 12px;
+        margin-top: 2rem;
+      }
+
+      h3 {
+        border-left: 3px solid var(--amber);
+        padding-left: 10px;
+        color: #444;
+      }
+
+      .author, .date {
+        font-size: 1rem;
+        color: #666;
+      }
+
+      /* Callout boxes */
+      .definisi {
+        background: var(--light-teal);
+        border-left: 5px solid var(--teal);
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin: 18px 0;
+      }
+
+      .rumus {
+        background: var(--light-amber);
+        border-left: 5px solid #d4a30c;
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin: 18px 0;
+        font-size: 1.05rem;
+      }
+
+      .contoh {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-top: 4px solid var(--coral);
+        border-radius: 6px;
+        padding: 18px 22px;
+        margin: 20px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      }
+
+      .contoh > p:first-child::before {
+        content: "✏️ Contoh Soal";
+        display: block;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.82rem;
+        letter-spacing: 1.2px;
+        color: var(--coral);
+        margin-bottom: 8px;
+        font-family: 'Source Sans 3', sans-serif;
+      }
+
+      .penurunan {
+        background: #f3f0fb;
+        border-left: 5px solid #7c5cbf;
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin: 18px 0;
+      }
+
+      .tip {
+        background: #e8f5e9;
+        border-left: 5px solid #43a047;
+        border-radius: 6px;
+        padding: 14px 18px;
+        margin: 14px 0;
+        font-size: 0.95rem;
+      }
+
+      /* Code blocks */
+      pre {
+        background: #1e1e2e !important;
+        color: #cdd6f4 !important;
+        border-radius: 8px !important;
+        font-family: 'Fira Code', monospace !important;
+        font-size: 0.88rem !important;
+        padding: 16px !important;
+        border: none !important;
+      }
+
+      code {
+        font-family: 'Fira Code', monospace !important;
+        font-size: 0.9em;
+        color: #d63a8c;
+        background: #f5f0fa;
+        padding: 2px 5px;
+        border-radius: 4px;
+      }
+
+      pre code {
+        color: #cdd6f4 !important;
+        background: transparent !important;
+      }
+
+      /* TOC sidebar */
+      .tocify {
+        border: none !important;
+        background: #fff !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border-radius: 8px;
+      }
+
+      .tocify-item a {
+        color: var(--indigo) !important;
+        font-size: 0.9rem;
+      }
+
+      .tocify-item.active a {
+        background: var(--light-teal) !important;
+        color: var(--teal) !important;
+        font-weight: 600;
+      }
+
+      /* Tables */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 16px 0;
+        font-size: 0.95rem;
+      }
+
+      th {
+        background: var(--indigo) !important;
+        color: white !important;
+        padding: 10px 14px;
+      }
+
+      td {
+        padding: 8px 14px;
+        border-bottom: 1px solid #e8e8e8;
+      }
+
+      tr:nth-child(even) { background: #f7f7f7; }
+      tr:hover { background: var(--light-teal); }
+
+      blockquote {
+        border-left: 4px solid var(--teal);
+        background: #f0faf9;
+        padding: 12px 18px;
+        color: #444;
+        font-style: italic;
+        border-radius: 0 6px 6px 0;
+      }
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo      = TRUE,
+  message   = FALSE,
+  warning   = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi       = 150
+)
+
+# Load semua paket yang diperlukan
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(scales)
+library(gridExtra)
+
+# Palet warna konsisten
+pal <- c(teal = "#2a9d8f", coral = "#e76f51", amber = "#e9c46a",
+         indigo = "#3d405b", purple = "#7c5cbf", green = "#43a047")
+theme_metstat <- function() {
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title   = element_text(family = "serif", face = "bold", size = 15,
+                                color = "#3d405b"),
+    plot.subtitle = element_text(size = 11, color = "#666"),
+    axis.title   = element_text(size = 11, color = "#444"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "#e8e8e8"),
+    plot.background  = element_rect(fill = "#faf9f6", color = NA),
+    panel.background = element_rect(fill = "#faf9f6", color = NA),
+    legend.background = element_rect(fill = "#faf9f6", color = NA)
+  )
+}
+```
+
+---
+
+# Bab 1: Pendahuluan dan Konsep Dasar Statistika
+
+<div class="definisi">
+**Definisi:** Statistika adalah cabang ilmu yang mencakup pengembangan dan penerapan metode pengumpulan, pengorganisasian, analisis, dan interpretasi data numerik, untuk mendukung pengambilan keputusan dalam kondisi ketidakpastian. *(Walpole et al., 2012)*
+</div>
+
+## Statistika Deskriptif vs Inferensia
+
+| Aspek | Statistika Deskriptif | Statistika Inferensia |
+|---|---|---|
+| **Tujuan** | Meringkas data yang diamati | Generalisasi ke populasi |
+| **Objek** | Sampel atau populasi penuh | Sampel → kesimpulan populasi |
+| **Output** | Mean, SD, histogram, boxplot | Uji hipotesis, selang kepercayaan |
+| **Ketidakpastian** | Tidak ada | Ada (error $\alpha$) |
+
+## Metode Deduksi dan Induksi
+
+<div class="rumus">
+- **Deduksi:** Umum $\rightarrow$ Khusus. Jika premis benar, kesimpulan *pasti* benar.  
+- **Induksi:** Khusus $\rightarrow$ Umum. Generalisasi dari sampel; ada kemungkinan error ($\alpha$).
+</div>
+
+## Skala Pengukuran Data
+
+<div class="definisi">
+Data diklasifikasikan berdasarkan **skala pengukuran** yang menentukan operasi statistik yang valid:
+
+| Skala | Contoh | Operasi Valid |
+|---|---|---|
+| **Nominal** | Jenis kelamin, warna | Modus, frekuensi |
+| **Ordinal** | Peringkat, skala Likert | Median, persentil |
+| **Interval** | Suhu (°C), IQ | Mean, SD (tanpa rasio) |
+| **Rasio** | Berat, tinggi, usia | Semua operasi statistik |
+</div>
+
+## Ukuran Pemusatan Data
+
+<div class="rumus">
+$$\bar{X} = \frac{\sum_{i=1}^n X_i}{n} \qquad \text{Median} = \text{nilai tengah data terurut}$$
+
+$$\text{Modus} = \text{nilai yang paling sering muncul}$$
+</div>
+
+## Ukuran Keragaman Data
+
+<div class="rumus">
+$$s^2 = \frac{\sum_{i=1}^n (X_i - \bar{X})^2}{n-1} \qquad s = \sqrt{s^2}$$
+
+$$\text{IQR} = Q_3 - Q_1 \qquad \text{CV} = \frac{s}{\bar{X}} \times 100\%$$
+</div>
+
+<div class="contoh">
+
+**Soal 1.1 — Analisis Deskriptif Dasar**
+
+Data tinggi badan 10 mahasiswa (cm): 165, 170, 168, 172, 175, 160, 180, 169, 171, 173.
+</div>
+
+```{r contoh1-1, fig.height=4}
+tinggi <- c(165, 170, 168, 172, 175, 160, 180, 169, 171, 173)
+
+# Ringkasan lengkap
+cat("=== Statistik Deskriptif ===\n")
+cat(sprintf("Mean    : %.2f cm\n", mean(tinggi)))
+cat(sprintf("Median  : %.2f cm\n", median(tinggi)))
+cat(sprintf("Std Dev : %.2f cm\n", sd(tinggi)))
+cat(sprintf("Varians : %.2f cm²\n", var(tinggi)))
+cat(sprintf("IQR     : %.2f cm\n", IQR(tinggi)))
+cat(sprintf("CV      : %.2f %%\n", sd(tinggi)/mean(tinggi)*100))
+cat(sprintf("Min     : %d cm  |  Max: %d cm\n", min(tinggi), max(tinggi)))
+
+# Visualisasi: Histogram + Boxplot berdampingan
+df <- data.frame(tinggi = tinggi)
+
+p1 <- ggplot(df, aes(x = tinggi)) +
+  geom_histogram(binwidth = 4, fill = pal["teal"], color = "white", alpha = 0.85) +
+  geom_vline(xintercept = mean(tinggi), color = pal["coral"], linewidth = 1.2,
+             linetype = "dashed") +
+  annotate("text", x = mean(tinggi) + 1.2, y = 2.5,
+           label = paste("Mean =", round(mean(tinggi),1)),
+           color = pal["coral"], hjust = 0, size = 4) +
+  labs(title = "Distribusi Tinggi Badan Mahasiswa",
+       subtitle = "Histogram dengan garis mean",
+       x = "Tinggi Badan (cm)", y = "Frekuensi") +
+  theme_metstat()
+
+p2 <- ggplot(df, aes(y = tinggi, x = "")) +
+  geom_boxplot(fill = pal["amber"], color = pal["indigo"],
+               outlier.color = pal["coral"], outlier.size = 3,
+               linewidth = 0.8, width = 0.5) +
+  stat_summary(fun = mean, geom = "point", shape = 18,
+               size = 4, color = pal["coral"]) +
+  labs(title = "Boxplot Tinggi Badan",
+       subtitle = "Berlian merah = mean",
+       x = "", y = "Tinggi Badan (cm)") +
+  theme_metstat()
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+<div class="contoh">
+
+**Soal 1.2 — Deteksi Pencilan dengan Z-Score**
+
+Gunakan Z-score untuk mendeteksi apakah ada mahasiswa dengan tinggi badan yang tergolong pencilan (|z| > 2).
+</div>
+
+```{r contoh1-2}
+z_scores <- (tinggi - mean(tinggi)) / sd(tinggi)
+hasil <- data.frame(
+  Mahasiswa = paste("Mhs", 1:10),
+  Tinggi    = tinggi,
+  Z_Score   = round(z_scores, 3),
+  Status    = ifelse(abs(z_scores) > 2, "⚠️ Pencilan", "✅ Normal")
+)
+print(hasil)
+```
+
+<div class="tip">
+💡 **Tips:** Secara umum, nilai dengan $|Z| > 2$ dapat dianggap sebagai *pencilan lunak*, dan $|Z| > 3$ sebagai *pencilan keras*.
+</div>
+
+---
+
+# Bab 2: Kaidah Peluang
+
+<div class="definisi">
+**Peluang** adalah ukuran kuantitatif dari ketidakpastian suatu kejadian, bernilai antara 0 (mustahil) dan 1 (pasti). *(Ross, 2014)*
+</div>
+
+## Aksioma Peluang (Kolmogorov)
+
+<div class="rumus">
+Untuk setiap kejadian $A$ dalam ruang contoh $S$:
+
+1. $P(A) \geq 0$
+2. $P(S) = 1$  
+3. Jika $A \cap B = \emptyset$, maka $P(A \cup B) = P(A) + P(B)$
+</div>
+
+## Teknik Mencacah: Permutasi dan Kombinasi
+
+<div class="rumus">
+$${}_{n}P_r = \frac{n!}{(n-r)!} \qquad \text{(urutan penting)}$$
+
+$${}_{n}C_r = \binom{n}{r} = \frac{n!}{r!\,(n-r)!} \qquad \text{(urutan tidak penting)}$$
+
+**Aturan Perkalian:** Bila kejadian 1 dapat terjadi $m$ cara dan kejadian 2 dapat terjadi $n$ cara, total = $m \times n$ cara.
+</div>
+
+## Aturan Penjumlahan dan Komplemen
+
+<div class="rumus">
+$$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$
+$$P(A^c) = 1 - P(A)$$
+$$P(A \cup B \cup C) = P(A)+P(B)+P(C) - P(A\cap B) - P(A\cap C) - P(B\cap C) + P(A\cap B\cap C)$$
+</div>
+
+<div class="contoh">
+
+**Soal 2.1 — Permutasi (Kompetisi)**
+
+Dari 10 finalis, akan dipilih juara 1, 2, dan 3. Berapa susunan pemenang yang mungkin?
+</div>
+
+```{r contoh2-1}
+n <- 10; r <- 3
+permutasi <- factorial(n) / factorial(n - r)
+cat(sprintf("10P3 = %d! / %d! = %d susunan\n", n, n-r, permutasi))
+```
+
+<div class="contoh">
+
+**Soal 2.2 — Kombinasi (Pemilihan Tim)**
+
+Dari 12 pelamar, dipilih 4 asisten. Berapa cara pemilihan?
+</div>
+
+```{r contoh2-2}
+kombinasi <- choose(12, 4)
+cat(sprintf("12C4 = %d cara pemilihan\n", kombinasi))
+```
+
+<div class="contoh">
+
+**Soal 2.3 — Peluang Union (Kartu Bridge)**
+
+Peluang mendapatkan King ATAU kartu merah dari 52 kartu.
+</div>
+
+```{r contoh2-3, fig.height=4}
+# Hitung peluang
+p_king  <- 4/52
+p_merah <- 26/52
+p_king_merah <- 2/52
+p_union <- p_king + p_merah - p_king_merah
+
+cat(sprintf("P(King)         = 4/52  = %.4f\n", p_king))
+cat(sprintf("P(Merah)        = 26/52 = %.4f\n", p_merah))
+cat(sprintf("P(King ∩ Merah) = 2/52  = %.4f\n", p_king_merah))
+cat(sprintf("P(King ∪ Merah) = %.4f\n", p_union))
+
+# Visualisasi diagram Venn sederhana
+df_venn <- data.frame(
+  set   = c("King\n(4/52)", "Irisan\nKing Merah\n(2/52)", "Merah\n(26/52)"),
+  nilai = c(2/52, 2/52, 24/52),
+  x     = c(1, 2, 3)
+)
+ggplot(df_venn, aes(x = x, y = nilai, fill = set)) +
+  geom_col(width = 0.6, color = "white", linewidth = 0.8) +
+  scale_fill_manual(values = c(pal["indigo"], pal["coral"], pal["teal"])) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Komposisi Peluang: King dan Kartu Merah",
+       subtitle = paste0("P(King ∪ Merah) = ", round(p_union, 4)),
+       x = "", y = "Peluang", fill = "") +
+  theme_metstat()
+```
+
+<div class="contoh">
+
+**Soal 2.4 — Aturan Perkalian (Diagram Pohon)**
+
+Sebuah kotak berisi 3 bola merah (M) dan 2 bola biru (B). Diambil 2 bola tanpa pengembalian. Hitung semua peluang kejadian.
+</div>
+
+```{r contoh2-4}
+# Semua kemungkinan pengambilan 2 bola (tanpa pengembalian)
+hasil_pohon <- data.frame(
+  Pengambilan_1 = c("Merah","Merah","Merah","Merah","Biru","Biru","Biru","Biru","Biru","Biru"),
+  Pengambilan_2 = c("Merah","Merah","Merah","Biru","Merah","Merah","Merah","Biru","Biru","Biru"),
+  Peluang = c(rep(3/5 * 2/4, 3), rep(3/5 * 2/4, 1), rep(2/5 * 3/4, 3), rep(2/5 * 1/4, 3))
+)
+
+# Ringkasan
+cat("P(MM) = (3/5)(2/4) =", round(3/5 * 2/4, 4), "\n")
+cat("P(MB) = (3/5)(2/4) =", round(3/5 * 2/4, 4), "\n")
+cat("P(BM) = (2/5)(3/4) =", round(2/5 * 3/4, 4), "\n")
+cat("P(BB) = (2/5)(1/4) =", round(2/5 * 1/4, 4), "\n")
+cat("Total =", round(3/5*2/4 + 3/5*2/4 + 2/5*3/4 + 2/5*1/4, 4), "\n")
+```
+
+---
+
+# Bab 3: Peluang Bersyarat dan Dalil Bayes
+
+<div class="definisi">
+**Peluang bersyarat** $P(A|B)$ mengukur probabilitas kejadian $A$ dengan asumsi kejadian $B$ telah terjadi.
+</div>
+
+## Definisi Formal
+
+<div class="rumus">
+$$P(A|B) = \frac{P(A \cap B)}{P(B)}, \quad P(B) > 0$$
+</div>
+
+## Aturan Perkalian Umum
+
+<div class="rumus">
+$$P(A \cap B) = P(A|B)\,P(B) = P(B|A)\,P(A)$$
+$$P(A \cap B \cap C) = P(A)\,P(B|A)\,P(C|A \cap B)$$
+</div>
+
+## Hukum Peluang Total
+
+<div class="rumus">
+Jika $\{H_1, H_2, \ldots, H_k\}$ merupakan partisi $S$:
+
+$$P(E) = \sum_{i=1}^{k} P(E|H_i)\,P(H_i)$$
+</div>
+
+## Dalil Bayes
+
+<div class="rumus">
+$$\boxed{P(H_i|E) = \frac{P(E|H_i)\,P(H_i)}{\displaystyle\sum_{j=1}^k P(E|H_j)\,P(H_j)}}$$
+
+- $P(H_i)$ = **prior** (peluang awal hipotesis)  
+- $P(E|H_i)$ = **likelihood** (peluang bukti jika hipotesis benar)  
+- $P(H_i|E)$ = **posterior** (peluang hipotesis setelah melihat bukti)
+</div>
+
+<div class="penurunan">
+**Penurunan Dalil Bayes:**
+
+Dari definisi peluang bersyarat:
+$$P(H|E) = \frac{P(H \cap E)}{P(E)} \quad \text{dan} \quad P(E|H) = \frac{P(H \cap E)}{P(H)}$$
+Maka $P(H \cap E) = P(E|H)\,P(H)$. Substitusi ke rumus pertama:
+$$P(H|E) = \frac{P(E|H)\,P(H)}{P(E)}$$
+</div>
+
+<div class="contoh">
+
+**Soal 3.1 — Diagnosa Medis (Dalil Bayes)**
+
+Tes COVID: sensitivitas 95%, spesifisitas 99%, prevalensi 2%. Berapa peluang benar-benar positif jika hasil tes positif?
+</div>
+
+```{r contoh3-1, fig.height=4.5}
+# Parameter
+prev       <- 0.02      # P(Sakit)
+sens       <- 0.95      # P(+ | Sakit)  – sensitivitas
+spec       <- 0.99      # P(- | Sehat)  – spesifisitas
+fpr        <- 1 - spec  # P(+ | Sehat)  – false positive rate
+
+p_pos      <- sens * prev + fpr * (1 - prev)   # Hukum peluang total
+ppv        <- (sens * prev) / p_pos            # Positive Predictive Value
+npv        <- (spec * (1-prev)) / (1 - p_pos)  # Negative Predictive Value
+
+cat("=== Analisis Tes Diagnostik ===\n")
+cat(sprintf("P(Sakit)                    = %.4f\n", prev))
+cat(sprintf("P(+ | Sakit)  sensitivitas  = %.4f\n", sens))
+cat(sprintf("P(+ | Sehat)  false pos rate = %.4f\n", fpr))
+cat(sprintf("P(Tes +)      peluang total  = %.4f\n", p_pos))
+cat(sprintf("PPV: P(Sakit | Tes +)        = %.4f (%.1f%%)\n", ppv, ppv*100))
+cat(sprintf("NPV: P(Sehat | Tes -)        = %.4f (%.1f%%)\n", npv, npv*100))
+
+# Visualisasi pengaruh prevalensi terhadap PPV
+prev_seq <- seq(0.001, 0.3, length = 200)
+ppv_seq  <- (sens * prev_seq) / (sens*prev_seq + fpr*(1-prev_seq))
+
+df_ppv <- data.frame(prevalensi = prev_seq * 100, PPV = ppv_seq * 100)
+
+ggplot(df_ppv, aes(x = prevalensi, y = PPV)) +
+  geom_line(color = pal["teal"], linewidth = 1.5) +
+  geom_vline(xintercept = prev*100, color = pal["coral"],
+             linetype = "dashed", linewidth = 1) +
+  geom_point(x = prev*100, y = ppv*100, size = 4, color = pal["coral"]) +
+  annotate("text", x = prev*100 + 1.5, y = ppv*100 - 5,
+           label = sprintf("Prev = %.0f%%\nPPV = %.1f%%", prev*100, ppv*100),
+           color = pal["coral"], hjust = 0, size = 3.5) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(title = "Pengaruh Prevalensi Terhadap Nilai Prediktif Positif (PPV)",
+       subtitle = "Sensitivitas = 95%, Spesifisitas = 99%",
+       x = "Prevalensi Penyakit (%)", y = "PPV (%)") +
+  theme_metstat()
+```
+
+<div class="contoh">
+
+**Soal 3.2 — Kejadian Independen (Dadu)**
+
+Dua dadu dilempar. A: dadu 1 = 4. B: jumlah = 7. Apakah A dan B independen?
+</div>
+
+```{r contoh3-2}
+S <- expand.grid(d1 = 1:6, d2 = 1:6)
+n_S <- nrow(S)
+
+p_A      <- nrow(subset(S, d1 == 4)) / n_S
+p_B      <- nrow(subset(S, d1 + d2 == 7)) / n_S
+p_A_B    <- nrow(subset(S, d1 == 4 & d1 + d2 == 7)) / n_S
+p_AxB    <- p_A * p_B
+
+cat(sprintf("P(A)       = %.4f\n", p_A))
+cat(sprintf("P(B)       = %.4f\n", p_B))
+cat(sprintf("P(A ∩ B)   = %.4f\n", p_A_B))
+cat(sprintf("P(A)×P(B)  = %.4f\n", p_AxB))
+cat(sprintf("\nKesimpulan: %s\n",
+    ifelse(round(p_A_B,4)==round(p_AxB,4), "✅ A dan B INDEPENDEN", "❌ A dan B tidak independen")))
+```
+
+---
+
+# Bab 4: Peubah Acak dan Sebaran Diskret
+
+<div class="definisi">
+**Peubah acak** adalah fungsi $X: S \rightarrow \mathbb{R}$ yang memetakan tiap elemen ruang contoh ke bilangan riil.
+</div>
+
+## Fungsi Peluang (PMF) dan CDF
+
+<div class="rumus">
+**PMF:** $f(x) = P(X = x) \geq 0$, dengan $\sum_x f(x) = 1$
+
+**CDF:** $F(x) = P(X \leq x) = \sum_{t \leq x} f(t)$
+
+**Nilai Harapan dan Varians:**
+$$E(X) = \sum_x x\,f(x) \qquad Var(X) = E(X^2) - [E(X)]^2$$
+</div>
+
+## Sebaran Binomial $B(n,p)$
+
+<div class="rumus">
+$$P(X=x) = \binom{n}{x}p^x(1-p)^{n-x}, \quad x=0,1,\ldots,n$$
+
+$$E(X) = np \qquad Var(X) = np(1-p)$$
+
+**Syarat (BINS):** Binary, Independent, Number fixed, Same $p$.
+</div>
+
+## Sebaran Poisson $P(\lambda)$
+
+<div class="rumus">
+$$P(X=x) = \frac{e^{-\lambda}\lambda^x}{x!}, \quad x=0,1,2,\ldots$$
+
+$$E(X) = Var(X) = \lambda$$
+
+Poisson sebagai aproksimasi Binomial bila $n$ besar dan $p$ kecil ($np = \lambda$).
+</div>
+
+## Sebaran Hipergeometrik
+
+<div class="rumus">
+Populasi $N$ dengan $K$ sukses, sampel $n$:
+
+$$P(X=x) = \frac{\binom{K}{x}\binom{N-K}{n-x}}{\binom{N}{n}}, \quad x = \max(0, n+K-N), \ldots, \min(n,K)$$
+
+$$E(X) = \frac{nK}{N} \qquad Var(X) = n\frac{K}{N}\frac{N-K}{N}\frac{N-n}{N-1}$$
+</div>
+
+<div class="contoh">
+
+**Soal 4.1 — Distribusi Binomial (Visualisasi Lengkap)**
+
+Mesin memproduksi komponen dengan tingkat cacat 10%. Jika diambil 20 komponen, visualisasikan distribusinya.
+</div>
+
+```{r contoh4-1, fig.height=4.5}
+n <- 20; p <- 0.10
+x <- 0:n
+pmf <- dbinom(x, n, p)
+cdf <- pbinom(x, n, p)
+
+# PMF
+df_bin <- data.frame(x = x, pmf = pmf, cdf = cdf)
+
+p1 <- ggplot(df_bin, aes(x = factor(x), y = pmf)) +
+  geom_col(fill = ifelse(x == 3, pal["coral"], pal["teal"]),
+           color = "white", alpha = 0.85) +
+  geom_text(aes(label = ifelse(round(pmf,3)>0.01, round(pmf,3), "")),
+            vjust = -0.3, size = 2.8, color = "#333") +
+  labs(title = "PMF — Binomial(20, 0.10)",
+       subtitle = "Batang merah: P(X = 3)",
+       x = "Jumlah Komponen Cacat (X)", y = "P(X = x)") +
+  theme_metstat() +
+  theme(axis.text.x = element_text(size = 8))
+
+p2 <- ggplot(df_bin, aes(x = x, y = cdf)) +
+  geom_step(color = pal["indigo"], linewidth = 1.2) +
+  geom_point(color = pal["coral"], size = 2) +
+  labs(title = "CDF — Binomial(20, 0.10)",
+       x = "x", y = "P(X ≤ x)") +
+  theme_metstat()
+
+grid.arrange(p1, p2, ncol = 2)
+
+# Hitung peluang khusus
+cat(sprintf("\nP(X = 3)    = %.4f\n", dbinom(3, 20, 0.10)))
+cat(sprintf("P(X ≤ 2)    = %.4f\n", pbinom(2, 20, 0.10)))
+cat(sprintf("P(X ≥ 5)    = %.4f\n", 1 - pbinom(4, 20, 0.10)))
+cat(sprintf("E(X) = np   = %.1f\n", 20 * 0.10))
+cat(sprintf("SD(X)       = %.4f\n", sqrt(20 * 0.10 * 0.90)))
+```
+
+<div class="contoh">
+
+**Soal 4.2 — Distribusi Poisson (Bank)**
+
+Rata-rata 5 nasabah per jam. Visualisasikan dan hitung $P(X > 8)$.
+</div>
+
+```{r contoh4-2, fig.height=4}
+lambda <- 5
+x <- 0:15
+pmf_poi <- dpois(x, lambda)
+
+df_poi <- data.frame(x = x, pmf = pmf_poi,
+                     warna = ifelse(x > 8, "X > 8", "X ≤ 8"))
+
+ggplot(df_poi, aes(x = factor(x), y = pmf, fill = warna)) +
+  geom_col(color = "white", alpha = 0.85) +
+  scale_fill_manual(values = c("X > 8" = pal["coral"], "X ≤ 8" = pal["teal"])) +
+  labs(title = paste0("PMF — Poisson(λ = ", lambda, ")"),
+       subtitle = sprintf("P(X > 8) = %.4f (area merah)", 1 - ppois(8, lambda)),
+       x = "Jumlah Nasabah (X)", y = "P(X = x)", fill = "") +
+  theme_metstat()
+
+cat(sprintf("P(X > 8) = 1 - P(X ≤ 8) = %.4f\n", 1 - ppois(8, lambda)))
+```
+
+<div class="contoh">
+
+**Soal 4.3 — Sebaran Hipergeometrik**
+
+Dari 20 produk (5 cacat), diambil 8 tanpa pengembalian. $P(X = 2)$?
+</div>
+
+```{r contoh4-3}
+N <- 20; K <- 5; n <- 8
+x_val <- 0:min(n, K)
+pmf_hyp <- dhyper(x_val, K, N - K, n)
+
+df_hyp <- data.frame(x = x_val, pmf = pmf_hyp)
+cat("Distribusi Hipergeometrik(N=20, K=5, n=8):\n")
+print(df_hyp)
+cat(sprintf("\nP(X = 2) = %.4f\n", dhyper(2, K, N-K, n)))
+cat(sprintf("E(X)     = nK/N = %.4f\n", n*K/N))
+```
+
+---
+
+# Bab 5: Sebaran Peluang Kontinu dan Distribusi Normal
+
+<div class="definisi">
+Peubah acak kontinu $X$ memiliki **fungsi kepekatan peluang (PDF)** $f(x)$ di mana:  
+$P(a < X < b) = \int_a^b f(x)\,dx$ dan $\int_{-\infty}^{\infty} f(x)\,dx = 1$
+</div>
+
+## Distribusi Normal $N(\mu, \sigma^2)$
+
+<div class="rumus">
+$$f(x;\mu,\sigma) = \frac{1}{\sigma\sqrt{2\pi}}\exp\!\left[-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right]$$
+
+**Sifat penting:** simetris, bell-shaped, $E(X)=\mu$, $Var(X)=\sigma^2$.
+
+**Aturan Empiris:**
+- $P(\mu - \sigma < X < \mu + \sigma) \approx 68.27\%$  
+- $P(\mu - 2\sigma < X < \mu + 2\sigma) \approx 95.45\%$  
+- $P(\mu - 3\sigma < X < \mu + 3\sigma) \approx 99.73\%$
+</div>
+
+## Standardisasi Z
+
+<div class="rumus">
+$$Z = \frac{X - \mu}{\sigma} \sim N(0,1)$$
+
+**Penurunan:** $E(Z) = \frac{E(X)-\mu}{\sigma} = 0$ dan $Var(Z) = \frac{Var(X)}{\sigma^2} = 1$.
+</div>
+
+## Distribusi Eksponensial $\text{Exp}(\lambda)$
+
+<div class="rumus">
+$$f(x) = \lambda e^{-\lambda x}, \quad x \geq 0$$
+$$E(X) = \frac{1}{\lambda} \qquad Var(X) = \frac{1}{\lambda^2}$$
+Sifat *memoryless*: $P(X > s+t \mid X > s) = P(X > t)$.
+</div>
+
+## Distribusi Gamma dan Chi-Square
+
+<div class="rumus">
+**Gamma** $\Gamma(\alpha, \beta)$: $f(x) = \frac{1}{\beta^\alpha\Gamma(\alpha)}x^{\alpha-1}e^{-x/\beta}$, $E(X)=\alpha\beta$
+
+**Chi-Square** $\chi^2(\nu)$: kasus khusus Gamma dengan $\alpha=\nu/2$, $\beta=2$.  
+Digunakan dalam uji hipotesis untuk varians dan tabel kontingensi.
+</div>
+
+<div class="contoh">
+
+**Soal 5.1 — Distribusi Normal Lengkap (Nilai Ujian)**
+
+Nilai ujian $\sim N(75, 10^2)$. Visualisasikan aturan empiris.
+</div>
+
+```{r contoh5-1, fig.height=4.5}
+mu <- 75; sigma <- 10
+x  <- seq(mu - 4*sigma, mu + 4*sigma, length = 500)
+y  <- dnorm(x, mu, sigma)
+df_norm <- data.frame(x = x, y = y)
+
+ggplot(df_norm, aes(x, y)) +
+  # Area 3 sigma
+  geom_area(data = subset(df_norm, x >= mu - 3*sigma & x <= mu + 3*sigma),
+            aes(x, y), fill = "#cce5ff", alpha = 0.6) +
+  # Area 2 sigma
+  geom_area(data = subset(df_norm, x >= mu - 2*sigma & x <= mu + 2*sigma),
+            aes(x, y), fill = "#99ccff", alpha = 0.6) +
+  # Area 1 sigma
+  geom_area(data = subset(df_norm, x >= mu - sigma & x <= mu + sigma),
+            aes(x, y), fill = pal["teal"], alpha = 0.5) +
+  geom_line(color = pal["indigo"], linewidth = 1.5) +
+  geom_vline(xintercept = mu, color = pal["coral"], linetype = "dashed", linewidth = 1) +
+  annotate("text", x = mu + 0.5, y = 0.041, label = "μ = 75",
+           color = pal["coral"], hjust = 0, size = 4) +
+  annotate("text", x = 56, y = 0.015, label = "68.27%\n(±1σ)", size = 3.5,
+           color = "white", fontface = "bold") +
+  annotate("text", x = 47, y = 0.005, label = "95.45%\n(±2σ)", size = 3, color = "#446699") +
+  annotate("text", x = 39, y = 0.001, label = "99.73% (±3σ)", size = 3, color = "#335588") +
+  labs(title = "Distribusi Normal N(75, 100) — Aturan Empiris",
+       x = "Nilai Ujian", y = "Kepekatan Peluang f(x)") +
+  theme_metstat()
+```
+
+```{r contoh5-2}
+cat("=== Perhitungan Peluang N(75, 100) ===\n")
+cat(sprintf("P(80 < X < 90)  = %.4f\n", pnorm(90, 75, 10) - pnorm(80, 75, 10)))
+cat(sprintf("P(X < 60)       = %.4f\n", pnorm(60, 75, 10)))
+cat(sprintf("P(X > 90)       = %.4f\n", 1 - pnorm(90, 75, 10)))
+cat(sprintf("Persentil ke-95 = %.2f\n", qnorm(0.95, 75, 10)))
+cat(sprintf("Persentil ke-5  = %.2f\n", qnorm(0.05, 75, 10)))
+```
+
+<div class="contoh">
+
+**Soal 5.2 — Perbandingan Tiga Distribusi Kontinu**
+
+Bandingkan bentuk distribusi Normal, Eksponensial, dan Uniform secara visual.
+</div>
+
+```{r contoh5-3, fig.height=4}
+x1 <- seq(-4, 4, length = 300)
+x2 <- seq(0, 5, length = 300)
+x3 <- seq(0, 1, length = 300)
+
+df_dist <- rbind(
+  data.frame(x = x1, y = dnorm(x1),      dist = "Normal(0,1)"),
+  data.frame(x = x2, y = dexp(x2, 1),    dist = "Eksponensial(λ=1)"),
+  data.frame(x = x3, y = dunif(x3, 0,1), dist = "Uniform(0,1)")
+)
+
+ggplot(df_dist, aes(x, y, color = dist, fill = dist)) +
+  geom_area(alpha = 0.2) +
+  geom_line(linewidth = 1.3) +
+  facet_wrap(~dist, scales = "free") +
+  scale_color_manual(values = c(pal["teal"], pal["coral"], pal["purple"])) +
+  scale_fill_manual(values  = c(pal["teal"], pal["coral"], pal["purple"])) +
+  labs(title = "Perbandingan Tiga Distribusi Kontinu Utama",
+       x = "x", y = "f(x)") +
+  theme_metstat() +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold", color = "#3d405b"))
+```
+
+---
+
+# Bab 6: Sebaran Percontohan (Sampling Distribution)
+
+<div class="definisi">
+**Sebaran percontohan** adalah distribusi peluang suatu statistik (misal $\bar{X}$) yang dihitung dari semua kemungkinan sampel berukuran $n$ dari populasi.
+</div>
+
+## Statistik vs Parameter
+
+| | Parameter Populasi | Statistik Sampel |
+|---|---|---|
+| **Rata-rata** | $\mu$ | $\bar{X}$ |
+| **Varians** | $\sigma^2$ | $s^2$ |
+| **Proporsi** | $p$ | $\hat{p}$ |
+| **Korelasi** | $\rho$ | $r$ |
+
+## Dalil Limit Pusat (Central Limit Theorem)
+
+<div class="rumus">
+Jika $X_1, X_2, \ldots, X_n$ adalah sampel acak IID dari populasi dengan $E(X)=\mu$ dan $Var(X)=\sigma^2 < \infty$, maka untuk $n$ besar:
+
+$$\bar{X} \xrightarrow{d} N\!\left(\mu,\, \frac{\sigma^2}{n}\right) \quad \text{atau} \quad Z = \frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \xrightarrow{d} N(0,1)$$
+
+Praktisnya: cukup $n \geq 30$ untuk distribusi tidak terlalu miring.
+</div>
+
+<div class="penurunan">
+**Penurunan $Var(\bar{X}) = \sigma^2/n$:**
+
+Karena $\bar{X} = \frac{1}{n}\sum_{i=1}^n X_i$ dan $X_i$ independen:
+$$Var(\bar{X}) = \frac{1}{n^2}\sum_{i=1}^n Var(X_i) = \frac{1}{n^2}(n\sigma^2) = \frac{\sigma^2}{n}$$
+Akarnya, $SE(\bar{X}) = \sigma/\sqrt{n}$, disebut **standar galat**.
+</div>
+
+## Distribusi t-Student dan Chi-Square
+
+<div class="rumus">
+**Distribusi $t$** dengan $\nu = n-1$ derajat bebas (digunakan bila $\sigma$ tidak diketahui):
+
+$$T = \frac{\bar{X} - \mu}{s/\sqrt{n}} \sim t_{n-1}$$
+
+**Distribusi $\chi^2$** (Chi-Square) dengan $\nu$ derajat bebas:
+
+$$\chi^2 = \frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{n-1}$$
+</div>
+
+<div class="contoh">
+
+**Soal 6.1 — Simulasi Dalil Limit Pusat**
+
+Populasi Uniform(0,1): ambil 1000 sampel berukuran $n=5$, $n=30$, $n=100$. Tunjukkan histogramnya.
+</div>
+
+```{r contoh6-1, fig.height=5}
+set.seed(42)
+sim_clm <- function(n_size, n_sim = 2000) {
+  replicate(n_sim, mean(runif(n_size, 0, 1)))
+}
+
+df_clm <- rbind(
+  data.frame(xbar = sim_clm(5),   n = "n = 5"),
+  data.frame(xbar = sim_clm(30),  n = "n = 30"),
+  data.frame(xbar = sim_clm(100), n = "n = 100")
+)
+df_clm$n <- factor(df_clm$n, levels = c("n = 5","n = 30","n = 100"))
+
+ggplot(df_clm, aes(x = xbar, fill = n)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 40,
+                 color = "white", alpha = 0.85) +
+  stat_function(fun = dnorm,
+                args = list(mean = 0.5, sd = sqrt(1/12/as.numeric(sub("n = ","",df_clm$n[1])))),
+                color = pal["indigo"], linewidth = 1) +
+  facet_wrap(~n, ncol = 3, scales = "free_y") +
+  scale_fill_manual(values = c(pal["amber"], pal["teal"], pal["coral"])) +
+  labs(title = "Simulasi Dalil Limit Pusat — Populasi Uniform(0,1)",
+       subtitle = "Semakin besar n, distribusi rata-rata sampel mendekati Normal",
+       x = "Rata-rata Sampel (X̄)", y = "Kepekatan") +
+  theme_metstat() +
+  theme(legend.position = "none",
+        strip.text = element_text(face = "bold", size = 12))
+```
+
+<div class="contoh">
+
+**Soal 6.2 — Pengaruh Ukuran Sampel Terhadap Standard Error**
+</div>
+
+```{r contoh6-2, fig.height=4}
+sigma <- 50
+n_vals <- 1:500
+se_vals <- sigma / sqrt(n_vals)
+
+df_se <- data.frame(n = n_vals, se = se_vals)
+
+ggplot(df_se, aes(x = n, y = se)) +
+  geom_line(color = pal["teal"], linewidth = 1.2) +
+  geom_hline(yintercept = c(5, 10), color = pal["coral"],
+             linetype = "dashed", alpha = 0.7) +
+  annotate("text", x = 480, y = 6, label = "SE = 5 (n ≈ 100)",
+           color = pal["coral"], size = 3.5, hjust = 1) +
+  annotate("text", x = 480, y = 11, label = "SE = 10 (n ≈ 25)",
+           color = pal["coral"], size = 3.5, hjust = 1) +
+  labs(title = "Standard Error vs Ukuran Sampel (σ = 50)",
+       subtitle = "SE turun cepat di awal, lalu semakin lambat (law of diminishing returns)",
+       x = "Ukuran Sampel (n)", y = "Standard Error (SE)") +
+  theme_metstat()
+
+# Tabel ringkas
+n_tbl <- c(10, 30, 50, 100, 200, 500, 1000)
+cat("\nTabel Standard Error:\n")
+print(data.frame(n = n_tbl, SE = round(sigma/sqrt(n_tbl), 3)))
+```
+
+<div class="contoh">
+
+**Soal 6.3 — Perbandingan Distribusi Normal vs t-Student**
+</div>
+
+```{r contoh6-3, fig.height=4}
+z  <- seq(-4, 4, length = 400)
+df_zt <- rbind(
+  data.frame(z = z, y = dnorm(z),     dist = "Normal(0,1)"),
+  data.frame(z = z, y = dt(z, df=3),  dist = "t (df = 3)"),
+  data.frame(z = z, y = dt(z, df=10), dist = "t (df = 10)"),
+  data.frame(z = z, y = dt(z, df=30), dist = "t (df = 30)")
+)
+
+ggplot(df_zt, aes(x = z, y = y, color = dist, linetype = dist)) +
+  geom_line(linewidth = 1.1) +
+  scale_color_manual(values = c(pal["indigo"], pal["coral"], pal["teal"], pal["amber"])) +
+  scale_linetype_manual(values = c("solid","dashed","dotdash","dotted")) +
+  labs(title = "Perbandingan Distribusi Normal Baku vs t-Student",
+       subtitle = "Semakin besar df, distribusi t mendekati Normal",
+       x = "z / t", y = "Kepekatan", color = "Distribusi", linetype = "Distribusi") +
+  theme_metstat()
+```
+
+---
+
+# Bab 7: Pendugaan Parameter dan Selang Kepercayaan
+
+<div class="definisi">
+**Pendugaan parameter** adalah proses menggunakan statistik sampel untuk mengestimasi parameter populasi yang tidak diketahui.
+</div>
+
+## Sifat Penduga yang Baik
+
+<div class="definisi">
+| Sifat | Definisi |
+|---|---|
+| **Tak Bias** | $E(\hat\theta) = \theta$ |
+| **Efisien** | MSE terkecil di antara semua penduga tak bias |
+| **Konsisten** | $\hat\theta \xrightarrow{p} \theta$ bila $n \to \infty$ |
+| **Cukup** | Menggunakan semua informasi dalam sampel tentang $\theta$ |
+</div>
+
+## Selang Kepercayaan untuk $\mu$
+
+<div class="rumus">
+**Bila $\sigma$ diketahui** (statistik Z):
+$$\bar{X} \pm Z_{\alpha/2}\frac{\sigma}{\sqrt{n}}$$
+
+**Bila $\sigma$ tidak diketahui** (statistik t, $df = n-1$):
+$$\bar{X} \pm t_{\alpha/2,\,n-1}\frac{s}{\sqrt{n}}$$
+
+**Margin of Error:** $E = Z_{\alpha/2}\dfrac{\sigma}{\sqrt{n}}$ atau $E = t_{\alpha/2,n-1}\dfrac{s}{\sqrt{n}}$
+</div>
+
+## Selang Kepercayaan untuk Proporsi
+
+<div class="rumus">
+$$\hat{p} \pm Z_{\alpha/2}\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$
+
+Berlaku bila $n\hat{p} \geq 10$ dan $n(1-\hat{p}) \geq 10$.
+</div>
+
+## Ukuran Sampel Minimum
+
+<div class="rumus">
+Untuk estimasi rata-rata dengan margin error $E$:
+$$n \geq \left(\frac{Z_{\alpha/2}\,\sigma}{E}\right)^2$$
+
+Untuk estimasi proporsi (bila $p$ tidak diketahui, gunakan $p=0.5$):
+$$n \geq \frac{Z_{\alpha/2}^2\,p(1-p)}{E^2}$$
+</div>
+
+<div class="contoh">
+
+**Soal 7.1 — Selang Kepercayaan Z (Batang Besi)**
+
+$n=50$, $\bar{X}=150$ kg, $\sigma=8$ kg. CI 90%, 95%, 99%.
+</div>
+
+```{r contoh7-1, fig.height=4.5}
+n <- 50; x_bar <- 150; sigma <- 8
+alphas <- c(0.10, 0.05, 0.01)
+levels <- c("90%","95%","99%")
+
+ci_df <- data.frame(
+  level = levels,
+  alpha = alphas,
+  z     = qnorm(1 - alphas/2),
+  lower = x_bar - qnorm(1 - alphas/2) * sigma/sqrt(n),
+  upper = x_bar + qnorm(1 - alphas/2) * sigma/sqrt(n)
+)
+ci_df$width <- ci_df$upper - ci_df$lower
+
+cat("=== Selang Kepercayaan (σ diketahui) ===\n")
+print(ci_df[, c("level","z","lower","upper","width")])
+
+# Visualisasi CI
+ggplot(ci_df, aes(y = level, x = x_bar)) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper, color = level),
+                 height = 0.3, linewidth = 1.5) +
+  geom_point(color = pal["coral"], size = 4) +
+  scale_color_manual(values = c(pal["teal"], pal["amber"], pal["coral"])) +
+  labs(title = "Visualisasi Selang Kepercayaan untuk μ",
+       subtitle = "Titik merah = estimasi titik (x̄ = 150 kg)",
+       x = "Kekuatan Batang Besi (kg)", y = "Tingkat Kepercayaan",
+       color = "") +
+  theme_metstat()
+```
+
+<div class="contoh">
+
+**Soal 7.2 — Selang Kepercayaan t (Isi Botol)**
+
+$n=10$, data isi botol. CI 99% dengan $\sigma$ tidak diketahui.
+</div>
+
+```{r contoh7-2}
+isi    <- c(502, 498, 501, 497, 499, 500, 503, 496, 501, 502)
+n      <- length(isi)
+x_bar  <- mean(isi)
+s      <- sd(isi)
+t_crit <- qt(0.995, df = n - 1)  # alpha = 0.01, two-tailed
+moe    <- t_crit * s / sqrt(n)
+
+cat("=== Selang Kepercayaan t (σ tidak diketahui) ===\n")
+cat(sprintf("n           = %d\n", n))
+cat(sprintf("x̄          = %.2f ml\n", x_bar))
+cat(sprintf("s           = %.4f ml\n", s))
+cat(sprintf("t(0.005, 9) = %.4f\n", t_crit))
+cat(sprintf("Margin of Error = %.4f\n", moe))
+cat(sprintf("CI 99%%: [%.2f, %.2f] ml\n", x_bar - moe, x_bar + moe))
+
+# Menggunakan fungsi bawaan R untuk konfirmasi
+ci_auto <- t.test(isi, conf.level = 0.99)
+cat(sprintf("Konfirmasi (t.test): [%.4f, %.4f]\n",
+            ci_auto$conf.int[1], ci_auto$conf.int[2]))
+```
+
+<div class="contoh">
+
+**Soal 7.3 — Selang Kepercayaan Proporsi**
+
+Dari 200 mahasiswa, 130 lulus tepat waktu. Hitung CI 95% untuk proporsi populasi.
+</div>
+
+```{r contoh7-3, fig.height=3.5}
+n_tot  <- 200
+x_suk  <- 130
+p_hat  <- x_suk / n_tot
+z_95   <- qnorm(0.975)
+se_p   <- sqrt(p_hat * (1-p_hat) / n_tot)
+moe_p  <- z_95 * se_p
+
+cat("=== CI untuk Proporsi ===\n")
+cat(sprintf("p̂ = %d/%d = %.4f\n", x_suk, n_tot, p_hat))
+cat(sprintf("SE(p̂) = %.4f\n", se_p))
+cat(sprintf("CI 95%%: [%.4f, %.4f]\n", p_hat - moe_p, p_hat + moe_p))
+cat(sprintf("Artinya: antara %.1f%% hingga %.1f%% lulus tepat waktu.\n",
+            (p_hat - moe_p)*100, (p_hat + moe_p)*100))
+
+# Visualisasi dengan berbagai ukuran sampel
+n_seq   <- seq(50, 1000, by = 10)
+moe_seq <- qnorm(0.975) * sqrt(p_hat*(1-p_hat)/n_seq)
+
+ggplot(data.frame(n = n_seq, moe = moe_seq), aes(x = n, y = moe*100)) +
+  geom_line(color = pal["teal"], linewidth = 1.3) +
+  geom_vline(xintercept = 200, color = pal["coral"], linetype = "dashed") +
+  geom_point(x = 200, y = moe_p*100, size = 4, color = pal["coral"]) +
+  annotate("text", x = 220, y = moe_p*100 + 0.5,
+           label = sprintf("n=200\nMoE=%.1f%%", moe_p*100),
+           color = pal["coral"], hjust = 0, size = 3.5) +
+  labs(title = "Hubungan Ukuran Sampel dan Margin of Error (Proporsi)",
+       subtitle = "p̂ = 0.65, α = 0.05",
+       x = "Ukuran Sampel (n)", y = "Margin of Error (%)") +
+  theme_metstat()
+```
+
+<div class="contoh">
+
+**Soal 7.4 — Penentuan Ukuran Sampel Minimum**
+
+Riset ingin mengestimasi rata-rata pendapatan dengan error maks. Rp 500.000 dan kepercayaan 95%. Diketahui $\sigma \approx$ Rp 3.000.000.
+</div>
+
+```{r contoh7-4}
+sigma_pop <- 3000000
+E_target  <- 500000
+z_val     <- qnorm(0.975)   # 95% CI
+
+n_min <- ceiling((z_val * sigma_pop / E_target)^2)
+cat(sprintf("Z(α/2)       = %.4f\n", z_val))
+cat(sprintf("σ            = Rp %s\n", format(sigma_pop, big.mark=",")))
+cat(sprintf("E (toleransi)= Rp %s\n", format(E_target, big.mark=",")))
+cat(sprintf("n minimum    = ⌈(%.4f × %d / %d)²⌉ = %d orang\n",
+            z_val, sigma_pop, E_target, n_min))
+```
+
+---
+
+# Bab 8: Pengujian Hipotesis
+
+<div class="definisi">
+**Pengujian hipotesis** adalah prosedur statistika untuk mengambil keputusan tentang suatu pernyataan mengenai parameter populasi berdasarkan data sampel.
+</div>
+
+## Kerangka Pengujian
+
+<div class="rumus">
+**Langkah Pengujian:**
+
+1. Tentukan $H_0$ (hipotesis nol) dan $H_1$ (hipotesis alternatif)  
+2. Pilih tingkat signifikansi $\alpha$ (biasanya 0.05 atau 0.01)  
+3. Hitung statistik uji  
+4. Tentukan daerah penolakan atau hitung $p$-*value*  
+5. Buat kesimpulan
+
+**Jenis Kesalahan:**
+
+| | $H_0$ Benar | $H_0$ Salah |
+|---|---|---|
+| **Tolak $H_0$** | Galat Tipe I ($\alpha$) | Keputusan Benar (Power = $1-\beta$) |
+| **Gagal Tolak $H_0$** | Keputusan Benar | Galat Tipe II ($\beta$) |
+</div>
+
+## Uji Satu Sampel
+
+<div class="rumus">
+**Statistik Uji untuk $\mu$:**
+
+Bila $\sigma$ diketahui: $Z = \dfrac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}$
+
+Bila $\sigma$ tidak diketahui: $T = \dfrac{\bar{X}-\mu_0}{s/\sqrt{n}} \sim t_{n-1}$
+
+**$p$-value** adalah probabilitas mendapatkan hasil setidak sama ekstremnya dengan observasi, jika $H_0$ benar.
+</div>
+
+<div class="contoh">
+
+**Soal 8.1 — Uji t Satu Sampel**
+
+Standar isi botol 500 ml. Sampel 10 botol: 502, 498, 501, 497, 499, 500, 503, 496, 501, 502. Apakah isi botol sesuai standar ($\alpha = 0.05$)?
+</div>
+
+```{r contoh8-1, fig.height=4}
+isi <- c(502, 498, 501, 497, 499, 500, 503, 496, 501, 502)
+
+# H0: mu = 500; H1: mu ≠ 500 (two-tailed)
+hasil_uji <- t.test(isi, mu = 500, alternative = "two.sided", conf.level = 0.95)
+
+cat("=== Uji t Satu Sampel ===\n")
+cat(sprintf("H0: μ = 500 ml\nH1: μ ≠ 500 ml\n\n"))
+cat(sprintf("x̄       = %.2f\n", mean(isi)))
+cat(sprintf("s        = %.4f\n", sd(isi)))
+cat(sprintf("t-hitung = %.4f\n", hasil_uji$statistic))
+cat(sprintf("df       = %d\n", hasil_uji$parameter))
+cat(sprintf("p-value  = %.4f\n", hasil_uji$p.value))
+cat(sprintf("Keputusan: %s H0 pada α = 0.05\n",
+    ifelse(hasil_uji$p.value < 0.05, "TOLAK", "GAGAL TOLAK")))
+cat(sprintf("Kesimpulan: Tidak cukup bukti bahwa isi botol berbeda dari 500 ml.\n"))
+
+# Visualisasi: distribusi t dan daerah penolakan
+t_val <- as.numeric(hasil_uji$statistic)
+df_t  <- hasil_uji$parameter
+t_seq <- seq(-4, 4, length = 400)
+t_crit_val <- qt(0.975, df_t)
+
+df_vis <- data.frame(t = t_seq, y = dt(t_seq, df_t))
+
+ggplot(df_vis, aes(t, y)) +
+  geom_area(data = subset(df_vis, t < -t_crit_val),
+            fill = pal["coral"], alpha = 0.4) +
+  geom_area(data = subset(df_vis, t > t_crit_val),
+            fill = pal["coral"], alpha = 0.4) +
+  geom_line(color = pal["indigo"], linewidth = 1.3) +
+  geom_vline(xintercept = c(-t_crit_val, t_crit_val),
+             color = pal["coral"], linetype = "dashed", linewidth = 1) +
+  geom_vline(xintercept = t_val, color = pal["teal"],
+             linetype = "solid", linewidth = 1.2) +
+  annotate("text", x = t_val + 0.2, y = 0.3,
+           label = sprintf("t = %.2f", t_val),
+           color = pal["teal"], hjust = 0, size = 4) +
+  annotate("text", x = 3.5, y = 0.05,
+           label = sprintf("Tolak\nα/2=%.3f", 0.025),
+           color = pal["coral"], size = 3.5) +
+  annotate("text", x = -3.5, y = 0.05,
+           label = sprintf("Tolak\nα/2=%.3f", 0.025),
+           color = pal["coral"], size = 3.5) +
+  labs(title = sprintf("Distribusi t(%d) — Uji Dua Arah (α = 0.05)", df_t),
+       subtitle = "Area merah = daerah penolakan | Garis hijau = t hitung",
+       x = "Nilai t", y = "f(t)") +
+  theme_metstat()
+```
+
+<div class="contoh">
+
+**Soal 8.2 — Uji Proporsi**
+
+Klaim: 60% pelanggan puas. Survei 150 pelanggan: 82 puas. Uji klaim ini ($\alpha = 0.05$).
+</div>
+
+```{r contoh8-2}
+# H0: p = 0.60; H1: p ≠ 0.60
+n_survey <- 150; x_puas <- 82
+p0 <- 0.60; p_hat_sur <- x_puas / n_survey
+
+z_stat <- (p_hat_sur - p0) / sqrt(p0 * (1 - p0) / n_survey)
+p_val  <- 2 * pnorm(-abs(z_stat))
+
+cat("=== Uji Proporsi Satu Sampel ===\n")
+cat(sprintf("H0: p = %.2f  |  H1: p ≠ %.2f\n\n", p0, p0))
+cat(sprintf("p̂       = %d/%d = %.4f\n", x_puas, n_survey, p_hat_sur))
+cat(sprintf("Z hitung = %.4f\n", z_stat))
+cat(sprintf("p-value  = %.4f\n", p_val))
+cat(sprintf("Keputusan: %s H0 pada α = 0.05\n",
+    ifelse(p_val < 0.05, "TOLAK", "GAGAL TOLAK")))
+```
+
+---
+
+# Ringkasan & Referensi
+
+## Peta Konsep Statistika
+
+```{r peta-konsep, fig.height=5.5}
+# Buat diagram batang ringkasan topik
+topik <- data.frame(
+  bab   = c("Deskriptif","Peluang","Bayes","Diskret","Kontinu","Sampling","Pendugaan","Uji Hipotesis"),
+  level = c(1, 2, 2, 3, 3, 4, 5, 5),
+  ket   = c("Statistik Dasar","Kaidah Peluang","Peluang Bersyarat",
+            "Distribusi Diskret","Distribusi Kontinu","Sebaran Percontohan",
+            "Estimasi Parameter","Uji Hipotesis")
+)
+topik$bab <- factor(topik$bab, levels = topik$bab)
+
+ggplot(topik, aes(x = bab, y = level, fill = factor(level))) +
+  geom_col(color = "white", linewidth = 0.8, width = 0.7) +
+  geom_text(aes(label = ket), vjust = -0.4, size = 3, color = "#333", fontface = "bold") +
+  scale_fill_manual(values = c("#d4f1ee","#aae6df","#6dcfc5","#2a9d8f",
+                               "#1e7a71","#145c55","#0d3d38","#061f1d")) +
+  scale_y_continuous(breaks = 1:5, labels = c("Bab 1","Bab 2-3","Bab 4-5","Bab 6","Bab 7-8")) +
+  labs(title = "Hierarki Materi Statistika Matematika",
+       subtitle = "Setiap bab membangun fondasi untuk bab berikutnya",
+       x = "Topik", y = "Level Kompleksitas") +
+  theme_metstat() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 15, hjust = 1, size = 9))
+```
+
+## Tabel Distribusi Penting
+
+```{r tabel-dist}
+tbl <- data.frame(
+  Distribusi = c("Binomial","Poisson","Hipergeometrik","Normal","Eksponensial","t-Student","Chi-Square"),
+  Parameter  = c("n, p","λ","N, K, n","μ, σ²","λ","ν=n-1","ν=n-1"),
+  EX         = c("np","λ","nK/N","μ","1/λ","0","ν"),
+  VarX       = c("np(1-p)","λ","...","σ²","1/λ²","ν/(ν-2)","2ν"),
+  Penggunaan = c("Percobaan Bernoulli berulang","Kejadian langka dalam interval",
+                 "Sampling tanpa pengembalian","Variabel kontinu simetris",
+                 "Waktu antar kejadian","CI/uji dengan σ tdk diketahui",
+                 "Uji varians & kecocokan")
+)
+knitr::kable(tbl, caption = "Ringkasan Distribusi Probabilitas Utama",
+             col.names = c("Distribusi","Parameter","E(X)","Var(X)","Penggunaan"))
+```
+
+## Referensi
+
+> - Walpole, R.E., Myers, R.H., Myers, S.L., & Ye, K. (2012). *Probability & Statistics for Engineers and Scientists* (9th ed.). Pearson.
+> - Ross, S.M. (2014). *Introduction to Probability and Statistics for Engineers and Scientists* (5th ed.). Academic Press.
+> - DeGroot, M.H., & Schervish, M.J. (2012). *Probability and Statistics* (4th ed.). Addison-Wesley.
+> - Casella, G., & Berger, R.L. (2002). *Statistical Inference* (2nd ed.). Duxbury Press.
+
+---
+
+*Dokumen ini dibuat dengan R Markdown oleh Nida Khairunnissa. Seluruh kode R dapat dijalankan ulang secara langsung.*
