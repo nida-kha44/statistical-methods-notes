@@ -1,0 +1,282 @@
+---
+title: "metstat"
+output: html_document
+date: "2026-05-20"
+---
+
+---
+title: "Dinamika Ketahanan Keluarga di Jawa Barat: Analisis Komprehensif Data Pernikahan dan Perceraian (2021-2023)"
+author: "Analisis Data Sosial"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(DT)
+library(stats)
+```
+
+1. Pendahuluan
+1.1 Latar Belakang
+Jawa Barat, sebagai provinsi dengan jumlah penduduk terbesar di Indonesia, memiliki dinamika sosial yang sangat kompleks. Salah satu indikator krusial dalam mengukur stabilitas sosial dan kesejahteraan keluarga adalah angka pernikahan dan perceraian. Periode 2021 hingga 2023 menjadi masa yang sangat menarik untuk dikaji, mengingat pergeseran kondisi sosial-ekonomi pasca-pandemi yang diduga berdampak signifikan terhadap keputusan berkeluarga maupun retaknya ikatan pernikahan.
+
+1.2 Urgensi dan Tujuan
+Analisis ini bertujuan untuk memetakan pola pernikahan dan perceraian di Jawa Barat menggunakan pendekatan statistika yang komprehensif. Hasil analisis ini diharapkan dapat menjadi rujukan bagi instansi terkait dalam merancang program ketahanan keluarga serta layanan konseling pernikahan yang lebih tepat sasaran di wilayah kritis.
+
+2. Persiapan Data
+Data diambil dari repositori publik yang mencakup data tahun 2021, 2022, dan 2023.
+```{r}
+# Definisi URL data
+url_2021 <- "https://github.com/nida-kha44/statistical-methods-notes/raw/main/data-projects/Jumlah%20Nikah%20dan%20Cerai%2C%202021.xlsx"
+url_2022 <- "https://github.com/nida-kha44/statistical-methods-notes/raw/main/data-projects/Jumlah%20Nikah%20dan%20Cerai%2C%202022.xlsx"
+url_2023 <- "https://github.com/nida-kha44/statistical-methods-notes/raw/main/data-projects/Jumlah%20Nikah%20dan%20Cerai%2C%202023.xlsx"
+
+# Fungsi untuk mengunduh dan membaca data
+read_remote_xlsx <- function(url, year) {
+  destfile <- paste0("data_", year, ".xlsx")
+  if(!file.exists(destfile)) {
+    download.file(url, destfile, mode = "wb")
+  }
+  df <- read_excel(destfile)
+  # Menambahkan kolom tahun
+  df$Tahun <- year
+  # Membersihkan nama kolom (asumsi urutan: Wilayah, Nikah, Cerai Tala, Cerai Gugat, Jumlah Cerai)
+  colnames(df) <- c("Wilayah", "Nikah", "Cerai_Talak", "Cerai_Gugat", "Jumlah_Cerai", "Tahun")
+  return(df)
+}
+
+# Membaca data
+data_2021 <- read_remote_xlsx(url_2021, 2021)
+data_2022 <- read_remote_xlsx(url_2022, 2022)
+data_2023 <- read_remote_xlsx(url_2023, 2023)
+```
+
+```{r}
+# Menggabungkan data
+all_data <- bind_rows(data_2021, data_2022, data_2023)
+
+# Memisahkan Data Makro (Provinsi) dan Data Wilayah (Kab/Kota)
+data_provinsi <- all_data %>% filter(grepl("Provinsi", Wilayah))
+data_wilayah <- all_data %>% filter(!grepl("Provinsi", Wilayah) & !grepl("Wilayah", Wilayah))
+
+# Pastikan tipe data numerik
+data_wilayah <- data_wilayah %>%
+  mutate(across(c(Nikah, Cerai_Talak, Cerai_Gugat, Jumlah_Cerai), as.numeric))
+
+head(data_provinsi)
+head(data_wilayah)
+```
+
+3. Modul 1: Statistika Deskriptif & Analisis Makro
+3.1 Tren Provinsi Jawa Barat (Analisis Makro)
+Meninjau perkembangan pernikahan dan perceraian secara keseluruhan di tingkat provinsi.
+```{r}
+plot_ly(data_provinsi, x = ~Tahun) %>%
+  add_lines(y = ~Nikah, name = "Pernikahan", line = list(color = 'blue')) %>%
+  add_lines(y = ~Jumlah_Cerai, name = "Total Perceraian", line = list(color = 'red')) %>%
+  layout(title = "Tren Pernikahan vs Perceraian di Provinsi Jawa Barat",
+         yaxis = list(title = "Jumlah Kasus"),
+         xaxis = list(title = "Tahun", tickmode = "array", tickvals = c(2021, 2022, 2023)))
+```
+
+3.2 Ringkasan Statistik Per Wilayah
+Berikut adalah tabel interaktif yang merangkum data dari seluruh Kabupaten/Kota di Jawa Barat.
+```{r}
+datatable(data_wilayah, filter = 'top', options = list(pageLength = 10),
+          caption = "Data Pernikahan dan Perceraian Kabupaten/Kota di Jawa Barat (2021-2023)")
+```
+
+4. Modul 2: Kaidah Peluang
+Dalam bagian ini, kita akan menghitung peluang kejadian tertentu berdasarkan data historis.
+
+4.1 Peluang Kejadian Sederhana
+Misalkan kita ingin mengetahui peluang sebuah kasus yang kita ambil secara acak dari tahun 2023 berasal dari wilayah tertentu.
+```{r}
+# Ambil data tahun 2023 saja
+data_2023_clean <- data_wilayah %>% filter(Tahun == 2023)
+total_nikah_2023 <- sum(data_2023_clean$Nikah, na.rm = TRUE)
+
+# --- BAGIAN BISA DIGANTI DAERAH ---
+# Silakan ganti "Bogor" dengan nama kabupaten/kota lain (misal: "Bandung", "Cirebon", dll.)
+# Pastikan ejaan sesuai dengan yang ada di tabel Modul 1.2
+target_daerah <- "Bogor" 
+# ----------------------------------
+
+nikah_daerah <- data_2023_clean %>% filter(Wilayah == target_daerah) %>% pull(Nikah)
+peluang_daerah <- nikah_daerah / total_nikah_2023
+
+cat("Peluang kejadian pernikahan terpilih berasal dari", target_daerah, "pada tahun 2023 adalah:", round(peluang_daerah, 4))
+```
+Tabel berikut menyajikan distribusi peluang empiris kejadian pernikahan di Provinsi Jawa Barat pada tahun 2023. Peluang ini menunjukkan probabilitas sebuah kasus pernikahan yang diambil secara acak akan berasal dari masing-masing kabupaten/kota tertentu
+```{r}
+library(dplyr)
+
+# 1. Ambil data tahun 2023 saja
+data_2023_clean <- data_wilayah %>% filter(Tahun == 2023)
+
+# 2. Hitung total nikah di Jawa Barat tahun 2023 sebagai pembagi
+total_nikah_2023 <- sum(data_2023_clean$Nikah, na.rm = TRUE)
+
+# 3. Hitung peluang untuk SEMUA daerah sekaligus
+tabel_peluang_jabar <- data_2023_clean %>%
+  group_by(Wilayah) %>%
+  summarise(
+    Jumlah_Nikah = sum(Nikah, na.rm = TRUE),
+    Peluang = Jumlah_Nikah / total_nikah_2023,
+    .groups = "drop"
+  ) %>%
+  # Mengurutkan dari peluang terbesar ke terkecil (opsional)
+  arrange(desc(Peluang))
+
+# 4. Tampilkan hasilnya dalam bentuk tabel rapi
+tabel_peluang_jabar
+```
+
+5. Modul 3: Peluang Bersyarat dan Dalil Bayes
+Dalil Bayes digunakan untuk memperbarui peluang suatu kejadian jika diberikan informasi tambahan.
+
+Skenario: Berapa peluang sebuah kasus perceraian adalah Cerai Talak jika diketahui kasus tersebut berasal dari wilayah Cirebon?
+
+Rumus Bayes: $$P(A|B) = \frac{P(B|A)P(A)}{P(B)}$$
+```{r}
+library(dplyr)
+
+# 1. Isolasi data khusus untuk wilayah Bogor saja
+data_bogor <- data_2023_clean %>% filter(Wilayah == "Bogor")
+
+# 2. Ambil angka murninya menggunakan sum() agar atribut tabelnya hilang
+talak_bogor  <- sum(data_bogor$Cerai_Talak, na.rm = TRUE)
+total_bogor  <- sum(data_bogor$Jumlah_Cerai, na.rm = TRUE)
+
+# 3. Hitung Peluang Bersyarat (Esensi Teorema Bayes)
+p_A_given_B <- talak_bogor / total_bogor
+
+# 4. Tampilkan hasil pembuktian komponen dan hasil akhir
+cat("--- Pengecekan Angka Murni ---\n")
+cat("Cerai Talak di Bogor   :", talak_bogor, "\n")
+cat("Total Cerai di Bogor   :", total_bogor, "\n")
+cat("------------------------------\n")
+cat("Peluang Cerai Talak dengan syarat berasal dari Bogor adalah:", round(p_A_given_B, 4), "\n")
+```
+
+
+6. Modul 4: Peubah Acak dan Sebaran Peluang Diskret
+Kita dapat memodelkan jumlah pernikahan tahunan di suatu wilayah menggunakan Distribusi Poisson, dengan asumsi kejadian pernikahan terjadi secara independen dalam interval waktu tertentu.
+```{r}
+library(dplyr)
+
+# 1. Tentukan daerah model
+daerah_model <- "Sukabumi"
+
+# 2. Hitung rata-rata pernikahan TAHUNAN (Lambda Tahunan)
+# Karena data kita adalah data tahunan, nilai rata-rata ini langsung menjadi Lambda kita
+lambda_tahunan <- data_wilayah %>% 
+  filter(Wilayah == daerah_model) %>% 
+  summarize(mean_nikah = mean(Nikah, na.rm = TRUE)) %>% 
+  pull(mean_nikah)
+
+# 3. Tentukan target jumlah pernikahan tahunan yang logis (x)
+# Misalnya: Kita ingin tahu peluang jumlah nikah di suatu tahun bernilai tepat 3000
+# Sesuai data Sukabumi di data kamu yang berkisar di angka ribuan
+x_tahunan <- 17899
+
+# 4. Hitung dengan distribusi Poisson tahunan
+prob_poisson <- dpois(x_tahunan, lambda = lambda_tahunan)
+
+# 5. Cetak hasil
+cat("Rata-rata pernikahan tahunan (Lambda) di", daerah_model, "adalah:", round(lambda_tahunan, 2), "\n")
+cat("Peluang terjadi tepat", x_tahunan, "pernikahan dalam SATU TAHUN di", daerah_model, "adalah:", round(prob_poisson, 6))
+```
+Catatan: Pendekatan Distribusi Poisson pada modul ini diubah ke skala tahunan untuk menyesuaikan dengan ketersediaan data pada data_wilayah. Pembagian rata-rata tahunan menjadi harian $(\lambda / 365)$ secara teoritis kurang akurat karena mengabaikan efek musiman pernikahan (seperti bulan-bulan tertentu setelah Lebaran yang biasanya mengalami lonjakan tinggi), yang melanggar asumsi stasioneritas Distribusi Poisson
+
+7. Modul 5: Sebaran Peluang Kontinu dan Distribusi Normal
+Kita menggunakan Z-Score untuk melakukan standardisasi pada data perceraian tahun 2021-2023 guna mengidentifikasi wilayah dengan angka perceraian yang relatif sangat tinggi (outlier).
+
+$$Z = \frac{X - \mu}{\sigma}$$
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# 1. Filter data induk untuk tahun 2021 - 2023
+data_3tahun <- data_wilayah %>% 
+  filter(Tahun %in% c(2021, 2022, 2023)) %>%
+  mutate(Jumlah_Cerai = as.numeric(Jumlah_Cerai)) # Pastikan tipenya numerik
+
+# 2. Hitung Mean, SD, dan Z-Score secara spesifik PER TAHUN menggunakan group_by
+data_3tahun_z <- data_3tahun %>%
+  group_by(Tahun) %>%
+  mutate(
+    mean_cerai = mean(Jumlah_Cerai, na.rm = TRUE),
+    sd_cerai   = sd(Jumlah_Cerai, na.rm = TRUE),
+    Z_Score_Cerai = (Jumlah_Cerai - mean_cerai) / sd_cerai
+  ) %>%
+  ungroup() # Lepas group_by setelah selesai menghitung
+
+# 3. Membuat visualisasi dengan 3 panel gambar (2021-2023)
+ggplot(data_3tahun_z, aes(x = Z_Score_Cerai)) +
+  # Gambar histogram (na.rm = TRUE untuk mengamankan data kosong)
+  geom_histogram(aes(y = after_stat(density)), bins = 10, fill = "skyblue", color = "white", na.rm = TRUE) +
+  # Tambahkan kurva normal baku ideal di setiap panel
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), color = "red", linewidth = 1) +
+  # Trik memecah gambar menjadi 3 berdasarkan kolom 'Tahun'
+  facet_wrap(~Tahun, ncol = 3) + 
+  # Atur label dan tema teks grafik
+  labs(title = "Perbandingan Distribusi Z-Score Perceraian (2021-2023) vs Kurva Normal Baku",
+       x = "Z-Score", 
+       y = "Densitas") +
+  theme_minimal() +
+  theme(strip.background = element_rect(fill = "lightgray"), # Mempercantik kotak judul tahun
+        strip.text = element_text(face = "bold", size = 11))
+```
+
+8. Modul 6: Sebaran Percontohan (Sampling Distribution)
+Berdasarkan Central Limit Theorem (CLT), jika kita mengambil banyak sampel acak dari populasi, distribusi rata-rata sampelnya akan mendekati distribusi normal.
+```{r}
+# Simulasi pengambilan 1000 sampel rata-rata
+set.seed(123)
+sample_means <- replicate(1000, mean(sample(data_wilayah$Nikah, 10, replace = TRUE)))
+
+hist(sample_means, breaks = 30, col = "lightgreen", main = "Simulasi CLT: Distribusi Rata-rata Sampel Pernikahan",
+     xlab = "Rata-rata Sampel", ylab = "Frekuensi")
+```
+Berdasarkan hasil simulasi pengambilan sampel acak sebanyak 1.000 kali dengan ukuran sampel $n = 10$, grafik menunjukkan bahwa distribusi rata-rata sampel (sample_means) pernikahan di Jawa Barat cenderung membentuk pola kurva simetris yang memusat di sekitar nilai 12.000 hingga 13.000. Bentuk distribusi yang menyerupai lonceng (bell-shaped) ini mengonfirmasi berlakunya teorema statistik utama dalam pengambilan sampel
+
+
+9. Modul 7: Pendugaan Parameter dan Uji Hipotesis
+9.1 Selang Kepercayaan (Confidence Interval)
+Kita akan menduga rata-rata pernikahan di Jawa Barat dengan tingkat kepercayaan 95%.
+```{r}
+n <- nrow(data_2023_clean)
+x_bar <- mean(data_2023_clean$Nikah)
+s <- sd(data_2023_clean$Nikah)
+error <- qt(0.975, df = n-1) * (s / sqrt(n))
+
+lower <- x_bar - error
+upper <- x_bar + error
+
+cat("Kita 95% yakin bahwa rata-rata pernikahan per wilayah di Jawa Barat berada dalam rentang:", round(lower, 2), "hingga", round(upper, 2))
+```
+
+9.2 Uji Hipotesis (T-Test)
+H0: Tidak ada perbedaan signifikan rata-rata jumlah pernikahan antara tahun 2021 dan 2023.
+H1: Terdapat perbedaan signifikan rata-rata jumlah pernikahan antara tahun 2021 dan 2023.
+```{r}
+t_test_result <- t.test(data_2021$Nikah, data_2023$Nikah)
+print(t_test_result)
+```
+erdasarkan hasil uji statistik di atas, kita Gagal Menolak $H_0$. Artinya, tidak terdapat perbedaan yang signifikan antara rata-rata jumlah pernikahan pada tahun 2021 dan tahun 2023 di Provinsi Jawa Barat.
+
+10. Kesimpulan
+Berdasarkan hasil analisis, kita dapat melihat pola pergerakan angka pernikahan dan perceraian di Jawa Barat. Implementasi metode statistika membantu kita tidak hanya dalam merangkum data secara deskriptif, tetapi juga memberikan kekuatan inferensial untuk memprediksi risiko dan memahami anomali di tingkat wilayah.
+
